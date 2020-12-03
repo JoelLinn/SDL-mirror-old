@@ -15,6 +15,7 @@ These are test programs for the SDL library:
 	testlocale  Test Locale API
 	testlock	Hacked up test of multi-threading and locking
 	testmultiaudio	Tests using several audio devices
+	testmutex	Simple tests for mutex
 	testoverlay2	Tests the overlay flickering/scaling during playback.
 	testplatform	Tests types, endianness and cpu capabilities
 	testsem		Tests SDL's semaphore implementation

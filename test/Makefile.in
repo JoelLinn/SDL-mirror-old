@@ -42,6 +42,7 @@ TARGETS = \
 	testlock$(EXE) \
 	testmessage$(EXE) \
 	testmultiaudio$(EXE) \
+	testmutex$(EXE) \
 	testnative$(EXE) \
 	testoverlay2$(EXE) \
 	testplatform$(EXE) \
@@ -174,6 +175,9 @@ testhaptic$(EXE): $(srcdir)/testhaptic.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 testhotplug$(EXE): $(srcdir)/testhotplug.c
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+testmutex$(EXE): $(srcdir)/testmutex.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 testrumble$(EXE): $(srcdir)/testrumble.c
