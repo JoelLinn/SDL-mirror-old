@@ -27,6 +27,8 @@
 static SDL_sem *sem;
 int alive;
 
+Uint32 timings[3];
+
 typedef struct Thread_State {
     SDL_Thread * thread;
     int number;
@@ -149,6 +151,8 @@ TestOverheadUncontended(void)
     SDL_Log("Took %d milliseconds\n\n", duration);
 
     SDL_DestroySemaphore(sem);
+
+    timings[0] = duration;
 }
 
 static int SDLCALL
@@ -239,6 +243,8 @@ TestOverheadContended(SDL_bool try_wait)
     SDL_Log("%s\n", textBuffer);
 
     SDL_DestroySemaphore(sem);
+    
+    timings[try_wait ? 2 : 1] = duration;
 }
 
 int
@@ -249,10 +255,12 @@ main(int argc, char **argv)
     /* Enable standard application logging */
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
+    /*
     if (argc < 2) {
         SDL_Log("Usage: %s init_value\n", argv[0]);
         return (1);
     }
+    */
 
     /* Load the SDL library */
     if (SDL_Init(0) < 0) {
@@ -262,18 +270,31 @@ main(int argc, char **argv)
     signal(SIGTERM, killed);
     signal(SIGINT, killed);
 
+    /*
     init_sem = atoi(argv[1]);
     if (init_sem > 0) {
         TestRealWorld(init_sem);
     }
 
     TestWaitTimeout();
+    */
 
     TestOverheadUncontended();
 
     TestOverheadContended(SDL_FALSE);
 
     TestOverheadContended(SDL_TRUE);
+
+    SDL_RWops *rw = SDL_RWFromFile("testsem.csv", "a");
+    SDL_assert_release(rw);
+    if(rw != NULL) {
+        char textBuffer[512];
+        size_t len = SDL_snprintf(textBuffer, sizeof(textBuffer), "%d\t%d\t%d\t%d\n",
+            (int)SDL_GetHintBoolean(SDL_HINT_WINDOWS_FORCE_SEMAPHORE_KERNEL, SDL_FALSE), timings[0], timings[1], timings[2]);
+        size_t len_written = SDL_RWwrite(rw, textBuffer, 1, len);
+        SDL_assert(len_written == len);
+        SDL_RWclose(rw);
+    }
 
     SDL_Quit();
     return (0);
