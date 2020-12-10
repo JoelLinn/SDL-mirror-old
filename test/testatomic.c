@@ -703,6 +703,17 @@ static void RunFIFOTest(SDL_bool lock_free)
         SDL_Log("%s", textBuffer);
     }
     SDL_Log("Readers read %d total events\n", grand_total);
+
+    SDL_RWops *rw = SDL_RWFromFile("testatomic.csv", "a");
+    SDL_assert_release(rw);
+    if(rw != NULL) {
+        char textBuffer[512];
+        size_t len = SDL_snprintf(textBuffer, sizeof(textBuffer), "%d\t%d\n",
+            (int)SDL_GetHintBoolean(SDL_HINT_WINDOWS_FORCE_MUTEX_CRITICAL_SECTIONS, SDL_FALSE), end - start);
+        size_t len_written = SDL_RWwrite(rw, textBuffer, 1, len);
+        SDL_assert(len_written == len);
+        SDL_RWclose(rw);
+    }
 }
 
 /* End FIFO test */
@@ -714,13 +725,13 @@ main(int argc, char *argv[])
     /* Enable standard application logging */
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
-    RunBasicTest();
-    RunEpicTest();
+    //RunBasicTest();
+    //RunEpicTest();
 /* This test is really slow, so don't run it by default */
-#if 0
+#if 1
     RunFIFOTest(SDL_FALSE);
 #endif
-    RunFIFOTest(SDL_TRUE);
+    //RunFIFOTest(SDL_TRUE);
     return 0;
 }
 
