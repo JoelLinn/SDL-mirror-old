@@ -77,8 +77,8 @@ typedef struct SDL_mutex_srw
 {
     SRWLOCK srw;
     /* SRW Locks are not recursive, that has to be handled by SDL: */
-    DWORD count;
-    DWORD owner;
+    //DWORD count;
+    //DWORD owner;
 } SDL_mutex_srw;
 
 static SDL_mutex *
@@ -108,23 +108,23 @@ static int
 SDL_LockMutex_srw(SDL_mutex * _mutex)
 {
     SDL_mutex_srw *mutex = (SDL_mutex_srw *)_mutex;
-    DWORD this_thread;
+    //DWORD this_thread;
 
     if (mutex == NULL) {
         return SDL_SetError("Passed a NULL mutex");
     }
 
-    this_thread = GetCurrentThreadId();
-    if (mutex->owner == this_thread) {
+    //this_thread = GetCurrentThreadId();
+    /*if (mutex->owner == this_thread) {
         ++mutex->count;
-    } else {
+    } else*/ {
         /* The order of operations is important.
            We set the locking thread id after we obtain the lock
            so unlocks from other threads will fail.
          */
         pAcquireSRWLockExclusive(&mutex->srw);
-        mutex->owner = this_thread;
-        ++mutex->count;
+        //mutex->owner = this_thread;
+        //++mutex->count;
     }
     return 0;
 }
@@ -133,20 +133,20 @@ static int
 SDL_TryLockMutex_srw(SDL_mutex * _mutex)
 {
     SDL_mutex_srw *mutex = (SDL_mutex_srw *)_mutex;
-    DWORD this_thread;
+    //DWORD this_thread;
     int retval = 0;
 
     if (mutex == NULL) {
         return SDL_SetError("Passed a NULL mutex");
     }
 
-    this_thread = GetCurrentThreadId();
+    /*this_thread = GetCurrentThreadId();
     if (mutex->owner == this_thread) {
         ++mutex->count;
-    } else {
+    } else*/ {
         if (pTryAcquireSRWLockExclusive(&mutex->srw) != 0) {
-            mutex->owner = this_thread;
-            ++mutex->count;
+            //mutex->owner = this_thread;
+            //++mutex->count;
         } else {
             retval = SDL_MUTEX_TIMEDOUT;
         }
@@ -163,14 +163,14 @@ SDL_UnlockMutex_srw(SDL_mutex * _mutex)
         return SDL_SetError("Passed a NULL mutex");
     }
 
-    if (mutex->owner == GetCurrentThreadId()) {
-        if (--mutex->count == 0) {
-            mutex->owner = 0;
+    //if (mutex->owner == GetCurrentThreadId()) {
+    //    if (--mutex->count == 0) {
+    //        mutex->owner = 0;
             pReleaseSRWLockExclusive(&mutex->srw);
-        }
+    /*    }
     } else {
         return SDL_SetError("mutex not owned by this thread");
-    }
+    }*/
 
     return 0;
 }

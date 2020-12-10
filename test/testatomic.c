@@ -709,7 +709,7 @@ static void RunFIFOTest(SDL_bool lock_free)
     if(rw != NULL) {
         char textBuffer[512];
         size_t len = SDL_snprintf(textBuffer, sizeof(textBuffer), "%d\t%d\n",
-            (int)SDL_GetHintBoolean(SDL_HINT_WINDOWS_FORCE_MUTEX_CRITICAL_SECTIONS, SDL_FALSE), end - start);
+            (int)SDL_GetHintBoolean(SDL_HINT_WINDOWS_FORCE_MUTEX_CRITICAL_SECTIONS, SDL_FALSE) + 2, end - start);
         size_t len_written = SDL_RWwrite(rw, textBuffer, 1, len);
         SDL_assert(len_written == len);
         SDL_RWclose(rw);
